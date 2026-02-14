@@ -12,7 +12,7 @@ func CreateTodo(c *gin.Context) {
   var todo models.Todo
 
   if err := c.ShouldBindJSON(&todo); err != nil {
-    c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+    c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
     return
   }
 
