@@ -27,7 +27,7 @@ go mod tidy
 docker exec -it postgres psql -U todo -d todo_db
 ```
 
-```postgresql
+```sql
 -- Show tables
 \dt
 
