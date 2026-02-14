@@ -1,8 +1,6 @@
 package main
 
 import (
-  "net/http"
-
   "github.com/gin-gonic/gin"
   "github.com/SharathKumarK06/todo-app/internal/database"
   "github.com/SharathKumarK06/todo-app/internal/todo"
@@ -15,15 +13,12 @@ func main() {
 
   r := gin.Default()
 
-  r.GET("/ping", func(c *gin.Context) {
-    c.JSON(http.StatusOK, gin.H{"message": "pong"})
-  })
-
+  // Create todo
   r.POST("/todos", func(c *gin.Context) {
     var t todo.Todo
 
     if err := c.BindJSON(&t); err != nil {
-      c.JSON(400, gin.H{"error": err.Error()})
+      c.JSON(400, gin.H{"error": "database problem"})
       return
     }
 
@@ -31,6 +26,7 @@ func main() {
     c.JSON(201, t)
   })
 
+  // Get list of todos
   r.GET("/todos", func(c *gin.Context) {
     var todos []todo.Todo
 
@@ -42,6 +38,7 @@ func main() {
     c.JSON(200, todos)
   })
 
+  // Delete todo
   r.DELETE("/todos/:id", func(c *gin.Context) {
     id := c.Param("id")
 
@@ -51,6 +48,31 @@ func main() {
     }
 
     c.JSON(200, gin.H{"message": "deleted"})
+  })
+
+  // Update todo
+  r.PUT("/todos/:id", func(c *gin.Context) {
+    id := c.Param("id")
+
+    var existing todo.Todo
+
+    if err := db.First(&existing, id).Error; err != nil {
+      c.JSON(404, gin.H{"error": "todo not found"})
+      return
+    }
+
+    var input todo.Todo
+    if err := c.ShouldBindJSON(&input); err != nil {
+      c.JSON(400, gin.H{"error": "invalid input"})
+      return
+    }
+
+    existing.Title = input.Title
+    existing.Completed = input.Completed
+
+    db.Save(&existing)
+
+    c.JSON(200, existing)
   })
 
   r.Run(":8080")
