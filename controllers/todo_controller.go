@@ -42,7 +42,7 @@ func UpdateTodo(c *gin.Context) {
   }
 
   var input models.Todo
-  if err := c.ShouldBindJSON(&input).Error; err != nil {
+  if err := c.ShouldBindJSON(&input); err != nil {
     c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
     return
   }
